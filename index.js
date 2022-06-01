@@ -21,7 +21,7 @@ var gridy = 550;
 
 
 var nodeCount = 0;
-var squaresize = 50;
+var squaresize = 20;
 const nodeList = [];
 var startnode;
 var endnode;
@@ -37,6 +37,7 @@ class Node{
     this.start = false;
     this.end = false;
     this.distance = -1;
+    this.distfromend = -1;
   }
 }
 
@@ -110,9 +111,11 @@ function clearCanvas() {
 }
 
 
-function refreshCanvas() {
+function shuffleCanvas() {
   for (let n of nodeList) {
-    n.color = backgroundcolor;
+    if(n.color!==greycolor){
+      n.color = backgroundcolor;
+    }
     n.start = false;
     n.end = false;
     colorNode(n);
@@ -120,20 +123,84 @@ function refreshCanvas() {
   randomStartEndNode();
 }
 
-function startPath (){
+function startBFSPath (){
   var pathlist = BFS();
   var i = 1;
   for (let p of pathlist) {
       //cause a delay
       setTimeout(function(){
         colorNode(p);
-      }, 100*i);
+      }, 50*i);
       i+=1;
   }
   setTimeout(function(){
     tracePath(pathlist);
-  }, 100*i);
+  }, 50*i);
 }
+
+function startAstarPath (){
+  var pathlist = Astar();
+  var i = 1;
+  for (let p of pathlist) {
+      //cause a delay
+      setTimeout(function(){
+        colorNode(p);
+      }, 50*i);
+      i+=1;
+  }
+  setTimeout(function(){
+    tracePath(pathlist);
+  }, 50*i);
+}
+
+//same as BFS but adds distance from node to end node
+function Astar(){
+  const graphlist = [...nodeList]
+  var pathlist = [];
+  const queuelist = [];
+  var dist = 0;
+  var n = startnode;
+  n.distance = dist;
+  n.distfromend = 0;
+  queuelist.push(startnode);
+  while(queuelist.length > 0){
+    //sort queue by closest distances
+    queuelist.sort((a, b) => (a.distfromend > b.distfromend) ? 1 : -1);
+    n = queuelist[0];
+    queuelist.shift();
+    //add edges to queue 
+    var distance = squaresize + 10;
+    const edgecoords = [[n.x+distance, n.y], [n.x-distance, n.y],  //right left
+      [n.x, n.y+distance], [n.x, n.y-distance]] //up down
+    for(let e of edgecoords){
+      for (let i=0;i!=graphlist.length;i++) {
+        var m = graphlist[i];
+        if(m.color != lightgreen){
+          if(m.x === e[0] && m.y ===e[1]){
+            if(m.end===true){
+              m.distance = dist+=1;
+              return pathlist;
+            }
+            if(m.color !== greycolor){
+              m.color = lightgreen;
+              if(m.start===false){
+                queuelist.push(m);
+                pathlist.push(m);
+                m.distance = dist+=1;
+                distFromEnd = ((n.x - endnode.x)**2 + (n.y-endnode.y)**2) ** 0.5
+                console.log(distFromEnd);
+                m.distfromend = distFromEnd;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return pathlist;
+}
+
+
 
 function BFS(){
   const graphlist = [...nodeList]
@@ -157,7 +224,6 @@ function BFS(){
           if(m.x === e[0] && m.y ===e[1]){
             if(m.end===true){
               m.distance = dist+=1;
-              console.log("found it!"); 
               return pathlist;
             }
             if(m.color !== greycolor){
@@ -224,7 +290,9 @@ function colorshortestpath(shortestpathnodes){
       //cause a delay
       setTimeout(function(){
         colorNode(p);
-      }, 70*i);
+      }, 20*i);
       i+=1;
   }
 }
+
+
