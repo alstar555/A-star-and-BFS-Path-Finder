@@ -18,10 +18,18 @@ code {
 }
 
 
-#startbtn {
+#startBFSbtn {
   position:absolute;
   left:70%;
   top:40%;
+  border-radius: 15px;
+  background-color: var(--btncolor);
+}
+
+#startAstarbtn {
+  position:absolute;
+  left:70%;
+  top:45%;
   border-radius: 15px;
   background-color: var(--btncolor);
 }
@@ -34,7 +42,7 @@ code {
   background-color: var(--btncolor);
 }
 
-#refreshbtn {
+#shufflebtn {
   position:absolute;
   left:70%;
   top:26%;
